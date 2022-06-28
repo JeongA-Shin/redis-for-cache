@@ -1,14 +1,19 @@
 package group.redisforcache.configure;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+//Redis와의 연결을 위한 설정
 
 @Configuration
-@EnableCaching // 해당 어노테이션을 선언하면 스프링 부트에서는 @Cacheable과 같은 캐싱 어노테이션의 사용을 인식
 public class RedisConfig {
 
   @Value("${spring.redis.host}")
@@ -17,9 +22,34 @@ public class RedisConfig {
   @Value("${spring.redis.port}")
   private int port;
 
+
+  //Spring Boot 에서 Redis 를 사용하는 방법에는 RedisRepository 와 RedisTemplate 두 가지가 있다
+
+  //0. Redis 사용을 위한 기본 Configuration (공통 세팅)
   @Bean
-  public RedisConnectionFactory redisConnectionFactory(){
-    return new LettuceConnectionFactory(host,port);
+  public RedisConnectionFactory redisConnectionFactory() {
+    RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+    redisStandaloneConfiguration.setHostName(host);
+    redisStandaloneConfiguration.setPort(port);
+    LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisStandaloneConfiguration);
+    return connectionFactory;
+  }
+
+  //1. RedisRepository를 사용하려면 여기서는 더 딱히 할 게 없음
+
+  //2. RedisTemplate 사용을 위한 빈 설정
+  @Bean
+  public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    RedisTemplate<Object, Object> template = new RedisTemplate<>();
+    template.setDefaultSerializer(RedisSerializer.json());
+    template.setKeySerializer(new StringRedisSerializer());//template.setKeySerializer(RedisSerializer.string());
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+    //TO-D0: https://www.geeksforgeeks.org/spring-boot-customize-the-jackson-objectmapper/
+    //JODA TIME 관련해서 Serialize 하는 것 찾아서 추가
+
+    template.setConnectionFactory(redisConnectionFactory);
+    return template;
   }
 
 }
