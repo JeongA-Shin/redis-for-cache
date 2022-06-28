@@ -1,5 +1,6 @@
 package group.redisforcache.feature.model.common;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -20,7 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class RegMod implements Mod,Reg{
+public class RegMod{//implements Mod,Reg
 //  /**
 //   * 등록자식별번호
 //   */
@@ -34,6 +35,7 @@ public abstract class RegMod implements Mod,Reg{
   @CreatedDate
   @Column(name = "reg_dt", nullable = false, updatable = false)
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
   private DateTime regDt;
 
 //  /**
@@ -49,6 +51,7 @@ public abstract class RegMod implements Mod,Reg{
   @LastModifiedDate
   @Column(name = "mod_dt")
   @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
   private DateTime modDt;
 
 }
