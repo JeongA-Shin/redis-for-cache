@@ -24,7 +24,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString(callSuper = true)
 //@EqualsAndHashCode(callSuper = true)
-public class Person { //extends RegMod  //extends RegMod implements Serializable
+public class Person implements Serializable { //extends RegMod  //extends RegMod implements Serializable
 
   //public static final long serialVersionUID = 42L;
   /**
